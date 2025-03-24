@@ -1,7 +1,9 @@
 import express, {Request,Response,NextFunction} from 'express'
 import createHttpError ,{ HttpError } from 'http-errors'
 import {config} from "./config/config"
+import userRouter from './user/userRouter'
 const app = express()
+
 
 
 app.get("/",(req,res,next)=>{
@@ -13,6 +15,8 @@ app.get("/",(req,res,next)=>{
     res.json({"message":"Welcome to our elib apis"})
 
 })
+
+app.use("/api/users",userRouter);
 
 //global error handler
 
