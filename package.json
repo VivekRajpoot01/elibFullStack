@@ -12,6 +12,7 @@
     "@eslint/js": "^9.23.0",
     "@types/dotenv": "^6.1.1",
     "@types/express": "^5.0.1",
+    "@types/http-errors": "^2.0.4",
     "@types/mongoose": "^5.11.96",
     "@types/node": "^22.13.12",
     "eslint": "^9.23.0",
@@ -24,6 +25,7 @@
   "dependencies": {
     "dotenv": "^16.4.7",
     "express": "^4.21.2",
+    "http-errors": "^2.0.0",
     "mongoose": "^8.12.2"
   }
 }
