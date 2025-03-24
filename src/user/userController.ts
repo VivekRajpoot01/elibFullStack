@@ -5,6 +5,7 @@ import bcrypt from "bcrypt";
 import { sign } from "jsonwebtoken";
 import {config} from "../config/config"
 import { User } from "./userTypes";
+import { access } from "fs";
 
 const createUser = async(req:Request,res:Response,next:NextFunction)=>{
 
@@ -56,4 +57,46 @@ const createUser = async(req:Request,res:Response,next:NextFunction)=>{
     }
 };
 
-export {createUser};
+const loginUser = async(req:Request,res:Response,next:NextFunction)=>{
+
+    const {email, password} = req.body;
+
+    if(!email || !password){
+        return next(createHttpError(400,"All fields are required"));
+    }
+
+    try{
+        const user = await userModel.findOne({email});
+
+        if(!user){
+            return next(createHttpError(404,"User not found"))
+        }
+
+        const isMatch = await bcrypt.compare(password,user.password);
+
+        if(!isMatch){
+            return next(createHttpError(400,"Username or password is incorrect"));
+        }
+
+
+        try{
+            const token = sign({sub:user._id},config.jwtSecret as string, {expiresIn: '7d'})
+
+
+            res.json({accessToken: token})
+        }catch(err){
+            return next(createHttpError(400,"User not exist"));
+        }
+        
+
+
+    }catch(err){
+        return next(createHttpError(400,"User Not Found"))
+    }
+
+
+
+    
+}
+
+export {createUser, loginUser};
