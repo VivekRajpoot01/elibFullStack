@@ -201,7 +201,7 @@ const deleteBook = async (req: Request,res: Response,next: NextFunction)=>{
     });
     await bookModel.deleteOne({ _id: bookId });
 
-    return res.sendStatus(204);
+    res.sendStatus(204);
 };
 
 export {createBook, updateBook, listBooks, getSingleBook, deleteBook};
