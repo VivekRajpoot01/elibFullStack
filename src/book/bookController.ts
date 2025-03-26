@@ -170,5 +170,39 @@ const getSingleBook = async (req: Request,res: Response,next: NextFunction) => {
     }
 };
 
-export {createBook, updateBook, listBooks, getSingleBook};
+const deleteBook = async (req: Request,res: Response,next: NextFunction)=>{
+    const bookId = req.params.bookId;
+
+    const book = await bookModel.findOne({ _id: bookId });
+    if (!book) {
+        return next(createHttpError(404, "Book not found"));
+    }
+
+    // Check Access
+    const _req = req as AuthRequest;
+    if (book.author.toString() !== _req.userId) {
+        return next(createHttpError(403, "You can not update others book."));
+    }
+
+    //book-covers/nhuywc7n3njq7j70vycd -> this is public id
+    //https://res.cloudinary.com/dl5z2gmtw/image/upload/v1742983327/book-covers/nhuywc7n3njq7j70vycd.png -> from this url we have to extract public id
+
+    const coverFileSplits = book.coverImage.split("/");
+    const coverImagePublicId = coverFileSplits.at(-2) +"/" + coverFileSplits.at(-1)?.split(".").at(-2);
+
+    const bookFileSplits = book.file.split("/");
+    const bookFilePublicId = bookFileSplits.at(-2) + "/" + bookFileSplits.at(-1);
+    console.log("bookFilePublicId",bookFilePublicId);
+
+
+    await cloudinary.uploader.destroy(coverImagePublicId);
+    await cloudinary.uploader.destroy(bookFilePublicId, {
+        resource_type: "raw",
+    });
+    await bookModel.deleteOne({ _id: bookId });
+
+    return res.sendStatus(204);
+};
+
+export {createBook, updateBook, listBooks, getSingleBook, deleteBook};
 
